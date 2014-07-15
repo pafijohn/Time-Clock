@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="/styles/favicon.ico">
+    <title>SDA Time Clock</title>
+    <link rel='stylesheet' href='/styles/css/foundation.min.css'>
+    <script>
+    function SubmitLoginForm() {
+      document.getElementById('LoginForm').submit();
+    }
+    function handle(e){
+      if(e.keyCode === 13) {
+        SubmitLoginForm();
+      }
+      return false;
+    }
+    </script>
+  </head>
+  <body onload="document.getElementById('UserName').focus();">
+    <div class="row">
+      <div class="small-2 large-4 columns">&nbsp;</div>
+      <div class="small-4 large-4 columns">
+        <h1 class="text-center">Please Log In</h1>
+        <form id="LoginForm" action="/LoginPost" method="post">
+          <div class="large-4 row">
+            <input id="UserName" name="UserName" type="text" placeholder="Username" onkeypress="handle(event)" autocomplete="off"/>
+          </div>
+          <div class="large-4 row">
+            <input id="UserPassword" name="UserPassword" type="password" placeholder="Password" onkeypress="handle(event)" autocomplete="off"/>
+          </div>
+          <div class="large-4 row">
+            <a href="#" class="button expand" onclick="SubmitLoginForm()">Submit</a>
+          </div>
+        </form>
+      </div>
+      <div class="small-6 large-4 columns">&nbsp;</div>
+    </div>
+  </body>
+</html>

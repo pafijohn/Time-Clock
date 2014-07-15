@@ -1,0 +1,32 @@
+<div class="col-xs-2 pull-right">
+  <label class="control-label" for="payPeriodSelect">Pay Period:</label>
+  <select id="payPeriodSelect" onchange="location = this.options[this.selectedIndex].value;">
+      {{#each PayPeriods}}
+      {{#if this.selected}}
+      <option selected>{{this.val}}</option>
+      {{else}}
+      <option value="/Hours/{{this.val}}">{{this.val}}</option>
+      {{/if}}
+      {{/each}}
+  </select>
+</div>
+<table style="width: 100%">
+  <thead>
+    <tr>
+      <th style="width: 25%">Job Name</th>
+      <th style="width: 25%">Time In</th>
+      <th style="width: 25%">Time Out</th>
+      <th style="width: 25%">Hours Worked</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each TimeRecords}}
+    <tr>
+      <td>{{this.JobName}}</td>
+      <td>{{MsTime this.TimeIn}}</td>
+      <td>{{MsTime this.TimeOut}}</td>
+      <td>{{HoursDiff this}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

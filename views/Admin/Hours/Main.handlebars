@@ -1,0 +1,100 @@
+<script>
+$(function() {
+    handleClick = function(id) {
+      window.location.href = '/Admin/Hours/Edit/' + id;
+    }
+    
+    queryHours = function() {
+      $.get( '/Admin/Hours/Query/', {
+          UserId:    $('#User>select>option:selected').val(),
+          JobId:     $('#Job>select>option:selected').val(),
+          Comment  : $('#RecordComment>input').val(),
+          PayPeriod: $('#PayPeriod>select>option:selected').val(),
+          Valid:     $('#Valid>select>option:selected').val(),
+        }, function( data ) {
+          $('table>tbody').html(data);
+        }
+      );
+    }
+    $('nav>section>ul>li>a[href="/Admin/Hours"]').parent().addClass('active');
+    queryHours();
+});
+</script>
+
+<div>
+  <div class="row">
+    <div id="User" class="large-6 columns">
+      <label>User</label>
+      <select name="UserId">
+        <option value="" selected="selected">Any</option>
+        {{#each users}}
+        <option value="{{this._id}}">{{this.UserName}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div id="Job" class="large-6 columns">
+      <label>Job</label>
+      <select name="JobId">
+        <option value="" selected="selected">Any</option>
+        {{#each jobs}}
+        <option value="{{this._id}}">{{this.JobName}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div id="RecordComment" class="large-12 columns">
+      <label>Comment</label>
+      <input name="RecordComment" type="text" autocomplete="off">
+    </div>
+  </div>
+  <div class="row">
+    <div id="PayPeriod" class="large-4 columns">
+      <label>Pay Period</label>
+      <select name="PayPeriod">
+        {{#each period}}
+        {{#if this.selected}}
+        <option selected>{{this.val}}</option>
+        {{else}}
+        <option>{{this.val}}</option>
+        {{/if}}
+        {{/each}}
+      </select>
+    </div>
+    <div id="Valid" class="large-4 columns">
+      <label>Valid</label>
+      <select name="Valid" id="Valid">
+        <option value="1" selected="selected">Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+    <div class="large-4 columns">
+      <a href="#" class="button expand" onclick="queryHours()">Search</a>
+    </div>
+  </div>
+</div>
+
+<table style="width: 100%">
+  <thead>
+    <tr>
+      <th style="width: 14.28%">User</th>
+      <th style="width: 14.28%">Job</th>
+      <th style="width: 14.28%">Time In</th>
+      <th style="width: 14.28%">Time Out</th>
+      <th style="width: 14.28%">Record Comment</th>
+      <th style="width: 14.28%">Pay Period</th>
+      <th style="width: 14.28%">Valid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="pseudo-link" onclick="handleClick('')">
+      <td>Create</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>

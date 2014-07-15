@@ -1,0 +1,28 @@
+<script>
+$(document).ready(function() {
+  handleClick = function() {
+    window.location.href = '/Admin/Assign/Edit/';
+  }
+  $('nav>section>ul>li>a[href="/Admin/Assign"]').parent().addClass('active')
+})
+</script>
+<table style="width: 100%">
+  <thead>
+    <tr>
+      <th style="width: 50%">User</th>
+      <th style="width: 50%">Job</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="pseudo-link" onclick="handleClick()">
+      <td>Edit</td>
+      <td></td>
+    </tr>
+  {{#each rows}}
+    <tr>
+      <td>{{this.UserName}}</td>
+      <td>{{this.JobName}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>

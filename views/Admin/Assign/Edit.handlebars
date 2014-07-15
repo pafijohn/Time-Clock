@@ -1,0 +1,44 @@
+<script>
+$(document).ready(
+  function() {
+    SubmitForm = function(i) {
+      var a = document.getElementById('EditForm');
+      var input = document.createElement('input');
+      input.name = 'method';
+      input.value = i;
+      input.style.display = 'none';
+      a.appendChild(input);
+      a.submit();
+    }
+  }
+);
+</script>
+
+<form id="EditForm" action="/Admin/Assign/Edit/" method="POST">
+  <div class="row">
+    <div class="large-6 columns">
+      <select name="UserIds" style="height: 500px" size="5" multiple>
+        {{#each users}}
+        <option value="{{this._id}}">{{this.UserName}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="large-6 columns">
+      <select name="JobIds" style="height: 500px" size="5" multiple>
+        {{#each jobs}}
+        <option value="{{this._id}}">{{this.JobName}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="large-3 columns">&nbsp;</div>
+    <a class="large-6 columns button" onclick="SubmitForm('ADD')">Add</a>
+    <div class="large-3 columns">&nbsp;</div>
+  </div>
+  <div class="row">
+    <div class="large-3 columns">&nbsp;</div>
+    <a class="large-6 columns button" onclick="SubmitForm('DELETE')">Remove</a>
+    <div class="large-3 columns">&nbsp;</div>
+  </div>
+</form>

@@ -1,0 +1,102 @@
+<script src="/scripts/validator.min.js"></script>
+<script src="/scripts/ErrorHandling.js"></script>
+<script>
+$(document).ready(function() {
+  
+  ValidateJobName = function() {
+    var JobName = $('#JobName>input').val();
+    var isIncorrectLength;
+    var hasInvalidChars;
+    
+    clearError('JobName');
+    
+    isIncorrectLength = setError('JobName', 'May not be empty or longer than 255 characters.', function() {
+      return !validator.isLength(JobName, 1, 255);
+    });
+    
+    hasInvalidChars = setError('JobName', 'Only alphanumeric characters, underscores, and spaces are allowed.', function() {
+      return !/^[\w ]*$/.test(JobName);
+    });
+    
+    return !(isIncorrectLength || hasInvalidChars);
+  }
+  
+  ValidateDesctiption = function() {
+    var JobDescription = $('#JobDescription>input').val();
+    var isIncorrectLength;
+    var hasInvalidChars;
+    
+    clearError('JobDescription');
+    
+    isIncorrectLength = setError('JobDescription', 'May not be empty or longer than 255 characters.', function() {
+      return !validator.isLength(JobDescription, 0, 255);
+    });
+    
+    hasInvalidChars = setError('JobDescription', 'Only alphanumeric characters, underscores, and spaces are allowed.', function() {
+      return !/^[\w ]*$/.test(JobDescription);
+    });
+    
+    return !(isIncorrectLength || hasInvalidChars);
+  }
+  
+  ValidateInput = function() {
+    var verifications = [
+      ValidateJobName,
+      ValidateDesctiption
+    ];
+    
+    var failures = 0;
+    for(var i in verifications) {
+      failures += verifications[i]() ? 0 : 1;
+    }
+    
+    if(!failures) {
+      $('form').submit();
+    }
+  }
+});
+</script>
+
+
+<h1 class="text-center">Edit Job</h1>
+<form name="input" action="/Admin/Jobs/Edit/" method="POST">
+  {{#if row}}
+  <input style="display: none" id="_id" name="_id" type="text" value="{{row._id}}">
+  {{else}}
+  <input style="display: none" id="_id" name="_id" type="text">
+  {{/if}}
+  <div class="row">
+    <div id="JobName" class="large-6 columns">
+      <label>Name</label>
+      <input name="JobName" type="text" value="{{row.JobName}}" onchange="ValidateJobName()"/>
+    </div>
+    <div id="JobDescription" class="large-6 columns">
+      <label>Description</label>
+      <input name="JobDescription" type="text" value="{{row.JobDescription}}" onchange="ValidateDesctiption()">
+    </div>
+  </div>
+  <div class="row">
+    <div id="Valid" class="large-6 columns">
+      <label>Valid</label>
+      <select name="Valid">
+      {{#if row}}
+        {{#if row.Valid}}
+          <option value="1" selected="selected">Yes</option>
+          <option value="0">No</option>
+        {{else}}
+          <option value="1">Yes</option>
+          <option value="0" selected="selected">No</option>
+        {{/if}}
+      {{else}}
+          <option value="1" selected="selected">Yes</option>
+          <option value="0">No</option>
+      {{/if}}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="large-4 columns">&nbsp;</div>
+    <a class="button large-4 columns" type="submit" onclick="ValidateInput()">Submit</a>
+    <div class="large-4 columns">&nbsp;</div>
+  </div>
+</form>

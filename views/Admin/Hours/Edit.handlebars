@@ -1,0 +1,181 @@
+<script src="/scripts/validator.min.js"></script>
+<script src="/scripts/ErrorHandling.js"></script>
+<script>
+$(document).ready(function() {
+  ValidateJob = function() {
+    var JobId = $('#Job>select>option:selected').val();
+    
+    clearError('Job');
+    var noJob = setError('Job', 'You must select a job.', function() {
+      return !validator.isInt(JobId);
+    });
+    return !noJob;
+  }
+
+  ValidateTimeIn = function() {
+    var TimeIn = $('#TimeIn>input').val();
+    
+    clearError('TimeIn');
+    var isNotDate = setError('TimeIn', 'Invalid format.', function() {
+      return !validator.isDate(TimeIn);
+    });
+    return !isNotDate;
+  }
+
+  ValidateTimeOut = function() {
+    var TimeIn = $('#TimeIn>input').val();
+    var TimeOut = $('#TimeOut>input').val();
+    
+    clearError('TimeOut');
+    var isNotDate = setError('TimeOut', 'Invalid format.', function() {
+      return !validator.isDate(TimeOut);
+    });
+    
+    var isNotAfter = setError('TimeOut', 'Time Out must be after Time In.', function() {
+      return validator.isBefore(TimeOut, TimeIn);
+    });
+    
+    return !(isNotDate || isNotAfter);
+  }
+
+  ValidateRecordComment = function() {
+    var isTooLong;
+    var hasInvalidChars;
+    var RecordComment = $('#RecordComment>input').val();
+    
+    clearError('RecordComment');
+    
+    isTooLong = setError('RecordComment', 'May not be longer than 255 characters.', function() {
+      return !validator.isLength(RecordComment, 0, 255);
+    });
+    
+    hasInvalidChars = setError('RecordComment', 'Only alphanumeric characters, underscores, and spaces are allowed.', function() {
+      return !/^[\w ]*$/.test(RecordComment);
+    });
+    
+    return !(isTooLong || hasInvalidChars);
+  }
+
+  ValidateInput = function() {
+    var verifications = [
+      ValidateJob,
+      ValidateTimeIn,
+      ValidateTimeOut,
+      ValidateRecordComment
+    ];
+    
+    var failures = 0;
+    for(var i in verifications) {
+      failures += verifications[i]() ? 0 : 1;
+    }
+    
+    if(!failures) {
+      $('form').submit();
+    }
+  }
+  
+  LoadXMLDoc = function () {
+    $.get( '/Admin/Ajax/UserJobs/' + $('#User>select')[0].selectedOptions[0].value, function( data ) {
+      $('#Job>select').html(data);
+    });
+  }
+// {{#unless row}}
+  LoadXMLDoc();
+// {{/unless}}
+});
+</script>
+
+<h1 class="text-center">Edit Hours</h1>
+
+<form action="/Admin/Hours/Edit/" method="POST">
+  {{#if row}}
+  <input name="_id" type="text" style="display: none" value="{{row._id}}">
+  {{else}}
+  <input name="_id" type="text" style="display: none" value="">
+  {{/if}}
+  <div class="row">
+    <div id="User" class="large-6 columns">
+      <label>User</label>
+      <select name="UserId" onchange="LoadXMLDoc()">
+        {{#each users}}
+        {{#if this.selected}}
+        <option value="{{this._id}}" selected>{{this.UserName}}</option>
+        {{else}}
+        <option value="{{this._id}}">{{this.UserName}}</option>
+        {{/if}}
+        {{/each}}
+      </select>
+    </div>
+    <div id="Job" class="large-6 columns">
+      <label>Job</label>
+      <select name="JobId" onchange="ValidateJob()">
+        {{#each jobs}}
+        {{#if this.selected}}
+          <option value="{{this._id}}" selected>{{this.JobName}}</option>
+        {{else}}
+          <option value="{{this._id}}">{{this.JobName}}</option>
+        {{/if}}
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div id="TimeIn" class="large-6 columns">
+      <label>Time In</label>
+      {{#if row}}
+      <input name="TimeIn" onchange="ValidateTimeIn()" type="text" placeholder="MM/DD/YY HH:mm" autocomplete="off" value="{{MsTime row.TimeIn}}">
+      {{else}}
+      <input name="TimeIn" onchange="ValidateTimeIn()" type="text" placeholder="MM/DD/YY HH:mm" autocomplete="off">
+      {{/if}}
+    </div>
+    <div id="TimeOut" class="large-6 columns">
+      <label>Time Out</label>
+      {{#if row}}
+      <input name="TimeOut" onchange="ValidateTimeOut()" type="text" placeholder="MM/DD/YY HH:mm" autocomplete="off" value="{{MsTime row.TimeOut}}">
+      {{else}}
+      <input name="TimeOut" onchange="ValidateTimeOut()" type="text" placeholder="MM/DD/YY HH:mm" autocomplete="off">
+      {{/if}}
+    </div>
+  </div>
+  <div class="row">
+    <div id="RecordComment" class="large-12 columns">
+      <label>Comment</label>
+      {{#if row}}
+      <input name="RecordComment" onchange="ValidateRecordComment()" type="text" autocomplete="off" value="{{row.RecordComment}}">
+      {{else}}
+      <input name="RecordComment" onchange="ValidateRecordComment()" type="text" autocomplete="off">
+      {{/if}}
+    </div>
+  </div>
+  <div class="row">
+    <div id="PayPeriod" class="large-6 columns">
+      <label>Pay Period</label>
+      <select name="PayPeriod">
+        {{#each period}}
+        {{#if this.selected}}
+        <option selected>{{this.val}}</option>
+        {{else}}
+        <option>{{this.val}}</option>
+        {{/if}}
+        {{/each}}
+      </select>
+    </div>
+    <div id="Valid" class="large-6 columns">
+      <label>Valid</label>
+      <select name="Valid" id="Valid">
+      {{#each valid}}
+      {{#if this.selected}}
+        <option selected="selected" value="1">{{Bool this.val}}</option>
+      {{else}}
+        <option value="0">{{Bool this.val}}</option>
+      {{/if}}
+      {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="large-4 columns">&nbsp;</div>
+    <a href="#" class="button large-4 columns" onclick="ValidateInput()">Submit</a>
+    <div class="large-4 columns">&nbsp;</div>
+  </div>
+</form>

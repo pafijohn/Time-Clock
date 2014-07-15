@@ -1,0 +1,65 @@
+<script>
+function handleClick(id) {
+  var form = document.createElement('form');
+  var input = document.createElement('input');
+  
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', '/Login');
+  form.style.display = 'none'
+  
+  input.setAttribute('name', '_id');
+  input.setAttribute('value', id);
+  
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
+
+{{#if ActiveJob}}
+<script>
+function logout() {
+  var form = document.createElement('form');
+  
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', '/Logout');
+  form.style.display = 'none'
+  
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
+
+<table style="width:100%">
+  <thead>
+    <tr>
+      <th style="width: 50%">Active Job</th>
+      <th style="width: 50%">Time In</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="pseudo-link" onclick="logout()">
+      <td>{{ActiveJob.JobName}}</td>
+      <td>{{MsTime ActiveJob.TimeIn}}</td>
+    </tr>
+  </tbody>
+</table>
+{{/if}}
+
+
+<table style="width:100%">
+  <thead>
+    <tr>
+      <th style="width: 50%">Job Name</th>
+      <th style="width: 50%">Job Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each Jobs}}
+      <tr class="pseudo-link" onclick="handleClick({{this._id}})">
+        <td>{{this.JobName}}</td>
+        <td>{{this.JobDescription}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
