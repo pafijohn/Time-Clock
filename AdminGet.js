@@ -2,7 +2,7 @@
 
 module.exports.Jobs = function( req, res )
 {
-	if( req.session.IsLoggedIn && req.session.IsAdmin )
+  if( req.session.IsLoggedIn && req.session.IsAdmin )
   {
     db.all( 'SELECT * FROM JobsTable WHERE Valid=1;', function( err, rows )
     {
@@ -14,8 +14,8 @@ module.exports.Jobs = function( req, res )
 	}
   else
   {
-		res.redirect( '/' );
-	}
+    res.redirect( '/' );
+  }
 };
 
 module.exports.JobsEdit = function( req, res )
@@ -34,8 +34,7 @@ module.exports.JobsEdit = function( req, res )
 
 module.exports.Hours = function( req, res )
 {
-  //db.all( 'SELECT TimeTable._id, UsersTable.UserName, JobsTable.JobName, TimeTable.TimeIn, TimeTable.TimeOut, TimeTable.RecordComment, TimeTable.PayPeriod, TimeTable.Valid FROM TimeTable WHERE Valid=1;', function( err, rows )
-  db.all( 'SELECT _id, UserName FROM UsersTable WHERE Valid=1;', function( err, users )
+  db.all( 'SELECT _id, UserName FROM UsersTable WHERE Valid=1 AND IsAdmin=0;', function( err, users )
   {
     db.all( 'SELECT _id, JobName FROM JobsTable WHERE Valid=1;', function( err, jobs )
     {
@@ -63,7 +62,7 @@ module.exports.HoursEdit = function( req, res )
   
   var _id = IsEdit ? validator.toInt( req.params[ 0 ] ) : null;
   
-  db.all( 'SELECT _id, UserName FROM UsersTable WHERE Valid=1;', function( err, users )
+  db.all( 'SELECT _id, UserName FROM UsersTable WHERE Valid=1 AND IsAdmin=0;', function( err, users )
   {
     db.get( 'SELECT * FROM TimeTable WHERE _id=?;', _id, function( err, row )
     {

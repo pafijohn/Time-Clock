@@ -10,7 +10,7 @@ module.exports.UserJobs = function( req, res )
   {
     var UserId = validator.toInt( req.params.UserId );
     var Stmt = '\
-      SELECT * \
+      SELECT JobsTable._id, JobsTable.JobName \
       FROM JobsTable \
       JOIN UserJobsTable \
       ON UserJobsTable.JobId=JobsTable._id \
@@ -25,7 +25,7 @@ module.exports.UserJobs = function( req, res )
       
       app.render( 'Admin/Hours/UsersToJobs', options, function( err, html )
       {
-        if(err) throw err;
+        if( err ) throw err;
         res.send( html );
       });
     });
@@ -96,7 +96,7 @@ module.exports.HoursQuery = function( req, res )
   
   Stmt += ';';
   
-  db.all( Stmt, params, function( err, rows )
+  db.all( Stmt, params, function( err, hours )
   {
     var emptyRecord = [ {
       _id: '\'\'',
@@ -108,15 +108,16 @@ module.exports.HoursQuery = function( req, res )
       PayPeriod: undefined,
       Valid: undefined
     } ];
-    rows = emptyRecord.concat( rows );
     
-    var options = {
+    records = emptyRecord.concat( hours );
+        
+    app.render( 'Admin/Hours/Query', {
       layout: false,
-      rows: rows
-    };
-    
-    app.render( 'Admin/Hours/Query', options, function( err, html )
+      rows: records
+    },
+    function( err, html )
     {
+      if ( err ) throw err;
       res.send( html );
     });
   });

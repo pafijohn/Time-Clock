@@ -2,6 +2,16 @@
 <script src="/scripts/ErrorHandling.js"></script>
 <script>
 $(document).ready(function() {
+  ValidateUser = function() {
+    var UserId = $('#User>select>option:selected').val();
+    
+    clearError('User');
+    var noUser = setError('User', 'You must select a user.', function() {
+      return ( UserId === undefined );
+    });
+    return !noUser;
+  }
+
   ValidateJob = function() {
     var JobId = $('#Job>select>option:selected').val();
     
@@ -58,6 +68,7 @@ $(document).ready(function() {
 
   ValidateInput = function() {
     var verifications = [
+      ValidateUser,
       ValidateJob,
       ValidateTimeIn,
       ValidateTimeOut,

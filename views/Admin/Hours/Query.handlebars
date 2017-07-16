@@ -1,11 +1,11 @@
-    {{#each rows}}
-    <tr class="pseudo-link" onclick="handleClick({{this._id}})">
-      <td>{{this.UserName}}</td>
-      <td>{{this.JobName}}</td>
-      <td>{{MsTime this.TimeIn}}</td>
-      <td>{{MsTime this.TimeOut}}</td>
-      <td>{{this.RecordComment}}</td>
-      <td>{{this.PayPeriod}}</td>
-      <td>{{Bool this.Valid}}</td>
-    </tr>
-    {{/each}}
+{{#each rows}}
+<tr class="pseudo-link" onclick="handleClick({{this._id}})">
+  <td>{{this.UserName}}</td>
+  <td>{{this.JobName}}</td>
+  <td>{{MsTime this.TimeIn}}</td>
+  <td>{{MsTime this.TimeOut}}</td>
+  <td>{{this.RecordComment}}</td>
+  <td>{{this.PayPeriod}}</td>
+  <td>{{Bool this.Valid}}</td>
+</tr>
+{{/each}}

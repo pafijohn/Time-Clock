@@ -11,11 +11,13 @@ $(function() {
           Comment  : $('#RecordComment>input').val(),
           PayPeriod: $('#PayPeriod>select>option:selected').val(),
           Valid:     $('#Valid>select>option:selected').val(),
-        }, function( data ) {
-          $('table>tbody').html(data);
+        },
+        function( data ) {
+          $('table>tbody').html( data );
         }
       );
     }
+    
     $('nav>section>ul>li>a[href="/Admin/Hours"]').parent().addClass('active');
     queryHours();
 });
