@@ -147,7 +147,7 @@ getPayPeriod = function()
 
 app.use(cookieParser());
 app.use(session({
-	secret: 'zaHP9zHNMhx3fu01F1FT',
+	secret: _.getSalt(),
 	resave: false,
 	saveUninitialized: true,
 	cookie: { secure: true }
@@ -164,21 +164,21 @@ app.all('*', ensureSecure); // at top of routing calls
 http.createServer(app).listen(80)
 
 function ensureSecure(req, res, next) {
-  if(req.secure)
-  {
-    // OK, continue
-    return next();
-  };
-  
-  // handle port numbers if you need non defaults
-  // res.redirect('https://' + req.host + req.url); // express 3.x
-  res.redirect('https://' + req.hostname + req.url); // express 4.x
+	if(req.secure)
+	{
+		// OK, continue
+		return next();
+	};
+	
+	// handle port numbers if you need non defaults
+	// res.redirect('https://' + req.host + req.url); // express 3.x
+	res.redirect('https://' + req.hostname + req.url); // express 4.x
 }
 
 
 // Miscellaneous Gets
-app.get('/',		  MiscGet.Index);
-app.get('/styles/*',  MiscGet.Styles);
+app.get('/', MiscGet.Index);
+app.get('/styles/*', MiscGet.Styles);
 app.get('/scripts/*', MiscGet.Scripts);
 
 // Miscellaneous Posts
@@ -234,8 +234,8 @@ app.route('/Admin/Assign/Edit/*')
 	.post(AdminPost.AssignEdit)
 
 // Client Gets
-app.get('/Jobs',			 ClientGet.ClientJobs);
-app.get('/Hours',			ClientGet.ClientHours);
+app.get('/Jobs', ClientGet.ClientJobs);
+app.get('/Hours', ClientGet.ClientHours);
 app.get('/Hours/:payPeriod', ClientGet.ClientHoursPayPeriod);
 
 // Client Posts
@@ -263,7 +263,7 @@ db.serialize(function()
 			Valid INTEGER NOT NULL\
 		);'
 	);
-  
+	
 	db.run(
 		'CREATE TABLE IF NOT EXISTS JobsTable\
 		(\
