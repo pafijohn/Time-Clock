@@ -2,95 +2,118 @@
 <script src="/scripts/ErrorHandling.js"></script>
 <script>
 $(document).ready(function(){
-  ValidateUserName = function() {
-    var UserName = $('#UserName>input').val();
-    var isIncorrectLength;
-    var hasInvalidChars;
-    
-    clearError('UserName');
-    
-    isIncorrectLength = setError('UserName', 'May not be empty or longer than 255 characters.', function() {
-      return !validator.isLength(UserName, 1, 255);
-    });
-    
-    hasInvalidChars = setError('UserName', 'Only alphanumeric characters, underscores, and spaces are allowed.', function() {
-      return !/^[\w ]*$/.test(UserName);
-    });
-    
-    return !(isIncorrectLength || hasInvalidChars);
-  }
-
-  ValidateInput = function() {
-    var verifications = [
-      ValidateUserName
-    ];
-    
-    var failures = 0;
-    for(var i in verifications) {
-      failures += verifications[i]() ? 0 : 1;
-    }
-    
-    if(!failures) {
-      $('form').submit();
-    }
-  }
+	ValidateUserName = function() {
+		var UserName = $('#UserName>input').val();
+		var isIncorrectLength;
+		var hasInvalidChars;
+		
+		clearError('UserName');
+		
+		isIncorrectLength = setError('UserName', 'May not be empty or longer than 255 characters.', function() {
+			return !validator.isLength(UserName, 1, 255);
+		});
+		
+		hasInvalidChars = setError('UserName', 'Only alphanumeric characters, underscores, and spaces are allowed.', function() {
+			return !/^[\w ]*$/.test(UserName);
+		});
+		
+		return !(isIncorrectLength || hasInvalidChars);
+	}
+	
+	ValidatePassword = function() {
+		{{#if row}}
+		var isEdit = true;
+		{{else}}
+		var isEdit = false;
+		{{/if}}
+		
+		var valid;
+		
+		if (!isEdit) {
+			valid = true;	
+		} else {
+			valid = $("#UserPassword>input").val().length > 0;
+		}
+		
+		return valid;
+	}
+	
+	ValidateInput = function() {
+		var verifications = [
+			ValidateUserName,
+			ValidatePassword
+		];
+		
+		var failures = 0;
+		for(var i in verifications) {
+			failures += verifications[i]() ? 0 : 1;
+		}
+		
+		if(!failures) {
+			$('form').submit();
+		}
+	}
 });
 </script>
 
 <h1 class="text-center">Edit User</h1>
 <form role="form" action="/Admin/Users/Edit/" method="post">
-  <div style="display: none" class="form-group">
-    <input name="_id" id="_id" type="text" value="{{row._id}}">
-  </div>
-  <div class="row">
-    <div id="UserName" class="large-6 columns">
-      <label>User Name</label>
-      <input name="UserName" type="text" value="{{row.UserName}}" onchange="ValidateUserName()">
-    </div>
-    <div id="UserPassword" class="large-6 columns">
-      <label>Password</label>
-      <input type="password" name="UserPassword">
-    </div>
-  </div>
-  <div class="row">
-    <div id="IsAdmin" class="large-6 columns">
-      <label>Admin</label>
-      <select name="IsAdmin">
-        {{#if row}}
-          {{#if row.IsAdmin}}
-          <option selected="selected" value="1">Yes</option>
-          <option value="0">No</option>
-          {{else}}
-          <option value="1">Yes</option>
-          <option selected="selected" value="0">No</option>
-          {{/if}}
-        {{else}}
-          <option value="1">Yes</option>
-          <option selected="selected" value="0">No</option>
-        {{/if}}
-      </select>
-    </div>
-    <div id="IsAdmin" class="large-6 columns">
-      <label>Valid</label>
-      <select name="Valid" id="Valid">
-      {{#if row}}
-        {{#if row.Valid}}
-        <option selected="selected" value="1">Yes</option>
-        <option value="0">No</option>
-        {{else}}
-        <option value="1">Yes</option>
-        <option selected="selected" value="0">No</option>
-        {{/if}}
-      {{else}}
-        <option selected="selected" value="1">Yes</option>
-        <option value="0">No</option>
-      {{/if}}
-      </select>
-    </div>
-  </div>
-  <div class="row">
-    <div class="large-4 columns">&nbsp;</div>
-    <a class="button large-4 columns" type="submit" onclick="ValidateInput()">Submit</a>
-    <div class="large-4 columns">&nbsp;</div>
-  </div>
+	<div style="display: none" class="form-group">
+		<input name="_id" id="_id" type="text" value="{{row._id}}">
+	</div>
+	<div class="row">
+		<div id="UserName" class="large-6 columns">
+			<label>User Name</label>
+			<input name="UserName" type="text" value="{{row.UserName}}" onchange="ValidateUserName()">
+		</div>
+		<div id="UserPassword" class="large-6 columns">
+			<label>Password</label>
+			{{#if row}}
+				<input type="password" name="UserPassword" placeholder="Blank for unchanged" onchange="ValidatePassword()">
+			{{else}}
+				<input type="password" name="UserPassword" onchange="ValidatePassword()">
+			{{/if}}
+		</div>
+	</div>
+	<div class="row">
+		<div id="IsAdmin" class="large-6 columns">
+			<label>Admin</label>
+			<select name="IsAdmin">
+				{{#if row}}
+					{{#if row.IsAdmin}}
+						<option selected="selected" value="1">Yes</option>
+						<option value="0">No</option>
+					{{else}}
+						<option value="1">Yes</option>
+						<option selected="selected" value="0">No</option>
+					{{/if}}
+				{{else}}
+					<option value="1">Yes</option>
+					<option selected="selected" value="0">No</option>
+				{{/if}}
+			</select>
+		</div>
+		<div id="IsAdmin" class="large-6 columns">
+			<label>Valid</label>
+			<select name="Valid" id="Valid">
+			{{#if row}}
+				{{#if row.Valid}}
+					<option selected="selected" value="1">Yes</option>
+					<option value="0">No</option>
+				{{else}}
+					<option value="1">Yes</option>
+					<option selected="selected" value="0">No</option>
+				{{/if}}
+			{{else}}
+				<option selected="selected" value="1">Yes</option>
+				<option value="0">No</option>
+			{{/if}}
+			</select>
+		</div>
+	</div>
+	<div class="row">
+		<div class="large-4 columns">&nbsp;</div>
+		<a class="button large-4 columns" type="submit" onclick="ValidateInput()">Submit</a>
+		<div class="large-4 columns">&nbsp;</div>
+	</div>
 </form>

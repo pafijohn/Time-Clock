@@ -1,0 +1,32 @@
+{
+  "name": "time-clock",
+  "version": "1.0.0",
+  "description": "Time-Clock ========== Required Libraries:<br>   https://github.com/expressjs/body-parser<br>   https://github.com/expressjs/cookie-parser<br>   https://github.com/visionmedia/express<br>   https://www.npmjs.org/package/express-params<br>   https://github.com/expressjs/session<br>   https://github.com/ericf/express3-handlebars<br>   https://github.com/wycats/handlebars.js<br>   https://github.com/assemble/handlebars-helpers<br>   https://github.com/moment/moment<br>   https://github.com/mapbox/node-sqlite3<br>   https://github.com/jashkenas/underscore<br>   https://github.com/chriso/validator.js<br>   <br>   http://jquery.com/<br>   http://foundation.zurb.com/<br>",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pafijohn/Time-Clock.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pafijohn/Time-Clock/issues"
+  },
+  "homepage": "https://github.com/pafijohn/Time-Clock#readme",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "express3-handlebars": "^0.5.2",
+    "handlebars": "^4.0.11",
+    "moment": "^2.19.4",
+    "sqlite3": "^3.1.13",
+    "underscore": "^1.8.3",
+    "validator": "^9.2.0"
+  }
+}
