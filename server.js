@@ -19,7 +19,7 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 
-db = new sqlite3.Database('TimeClock.db');
+db = new sqlite3.Database('TimeClock_V2.db');
 
 colors = require('colors');
 
@@ -34,8 +34,6 @@ var AdminVerify = require('./AdminVerify');
 var ClientGet = require('./ClientGet');
 var ClientPost = require('./ClientPost');
 var ClientAjax = require('./ClientAjax');
-
-var port = 80;
 
 var server_options = {
 	key: fs.readFileSync('/etc/letsencrypt/live/www.pafijohn.com/privkey.pem', 'utf-8'),
@@ -73,32 +71,47 @@ _.mixin({
 	}
 });
 
+_.mixin({
+	toDate: function(str) {
+		return moment(str, 'MM/DD/YY HH:mm', true);
+	}
+});
+
+_.mixin({
+	isDate: function(str) {
+		var valid = _.toDate(str).isValid();
+		
+		console.log('Date compare: ' + str + ', ' + valid);
+		return valid;
+	}
+});
+
 var hbs = exphbs.create({
 	defaultLayout: 'main',
 	helpers: {
-		MsTime: function (context, options)
-		{
-			if(context)
-			{
+		MsTime: function (context, options) {
+			if (context) {
 				return moment(context).format('MMM DD, YYYY HH:mm:ss');
 			}
 			return '';
 		},
-		HoursDiff: function (context, options)
-		{
-			if(context)
-			{
+		HoursDiff: function (context, options) {
+			if (context) {
 				var duration = moment.duration(moment(context.TimeOut).diff(moment(context.TimeIn)));
 				var hours = duration.asMinutes() / 60;
 				return String(hours);
 			}
 			return '';
 		},
-		Bool: function (context, options)
-		{
-			if(!_.isUndefined(context))
-			{
+		Bool: function (context, options) {
+			if (!_.isUndefined(context)) {
 				return (context) ? 'Yes' : 'No';
+			}
+			return '';
+		},
+		Concat: function (context, options) {
+			if (context) {
+				return context.join(', ');
 			}
 			return '';
 		},
@@ -251,7 +264,7 @@ app.get('/Admin/Ajax/UserJobs/:UserId', AdminAjax.UserJobs)
 db.serialize(function()
 {
 	db.run(
-		'CREATE TABLE IF NOT EXISTS TimeTable\
+		'CREATE TABLE IF NOT EXISTS Times\
 		(\
 			_id INTEGER PRIMARY KEY AUTOINCREMENT,\
 			UserId INTEGER NOT NULL,\
@@ -265,7 +278,7 @@ db.serialize(function()
 	);
 	
 	db.run(
-		'CREATE TABLE IF NOT EXISTS JobsTable\
+		'CREATE TABLE IF NOT EXISTS Jobs\
 		(\
 			_id INTEGER PRIMARY KEY AUTOINCREMENT,\
 			JobName TEXT NOT NULL,\
@@ -275,19 +288,18 @@ db.serialize(function()
 	);
 	
 	db.run(
-		'CREATE TABLE IF NOT EXISTS UsersTable\
+		'CREATE TABLE IF NOT EXISTS Users\
 		(\
 			_id INTEGER PRIMARY KEY AUTOINCREMENT,\
-			UserName TEXT NOT NULL UNIQUE,\
-			UserPassword TEXT NOT NULL,\
-			IsAdmin INTEGER NOT NULL,\
+			Name TEXT NOT NULL UNIQUE,\
+			Password TEXT NOT NULL,\
 			Valid INTEGER NOT NULL,\
 			Salt TEXT NOT NULL\
 		);'
 	);
 	
 	db.run(
-		'CREATE TABLE IF NOT EXISTS UserJobsTable\
+		'CREATE TABLE IF NOT EXISTS Assignments\
 		(\
 			_id INTEGER PRIMARY KEY AUTOINCREMENT,\
 			UserId INTEGER NOT NULL,\
@@ -295,14 +307,69 @@ db.serialize(function()
 		 );'
 	);
 	
-	// If there isn't a valid admin, make one
+	db.run(
+		'CREATE TABLE IF NOT EXISTS Permissions\
+		(\
+			_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+			UserId INTEGER,\
+			Permission TEXT NOT NULL UNIQUE,\
+			FOREIGN KEY (UserId) REFERENCES UsersTable\
+		);'
+	);
+	
+/*
+PERMISSIONS:
+	ASSIGN_PERMISSIONS
+	ASSIGN_JOB
+	
+	CREATE_USER
+	DELETE_USER
+	EDIT_USER
+	VIEW_USER
+	
+	CREATE_JOB
+	DELETE_JOB
+	EDIT_JOB
+	VIEW_JOB
+	
+	CREATE_TIME
+	DELETE_TIME
+	EDIT_TIME
+	VIEW_TIME
+*/
+	
+	// If there are no accounts, make the admin
+	// Not sure what to do if someone accidentally removes the admin account and doesnt replace it
 	// Shouldnt usually happen
-	db.get('SELECT * FROM UsersTable WHERE IsAdmin=1 AND Valid=1;', function(err, row) {
-		if(_.isUndefined(row))
-		{
+	db.get('SELECT * FROM Users WHERE Name=?;', 'admin', function(err, row) {
+		if(_.isUndefined(row)) {
 			var salt = _.getSalt();
 			var password = crypto.createHash('sha256').update('password' + salt).digest('base64');
-			db.run('INSERT INTO UsersTable VALUES(NULL,?,?,1,1,?);', 'admin', password, salt);
+			db.run('INSERT INTO Users VALUES(NULL,?,?,1,?);', 'admin', password, salt, function(err, row) {
+				db.get('SELECT _id FROM Users WHERE Name=?;', 'admin', function(err, row) {
+					_.each([
+						'ASSIGN_PERMISSIONS',
+						'ASSIGN_JOB',
+					
+						'CREATE_USER',
+						'DELETE_USER',
+						'EDIT_USER',
+						'VIEW_USER',
+						
+						'CREATE_JOB',
+						'DELETE_JOB',
+						'EDIT_JOB',
+						'VIEW_JOB',
+						
+						'CREATE_TIME',
+						'DELETE_TIME',
+						'EDIT_TIME',
+						'VIEW_TIME'
+					], function(item) {
+						db.run('INSERT INTO Permissions VALUES(NULL,?,?);', row._id, item);
+					});
+				});
+			});
 		}
 	});
 });

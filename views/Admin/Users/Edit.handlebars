@@ -29,10 +29,14 @@ $(document).ready(function(){
 		
 		var valid;
 		
-		if (!isEdit) {
+		clearError('UserPassword');
+		
+		if (isEdit) {
 			valid = true;	
 		} else {
-			valid = $("#UserPassword>input").val().length > 0;
+			valid = !setError('UserPassword', 'May not be empty or longer than 255 characters.', function() {
+				return !validator.isLength($('#UserPassword>input').val(), 1, 255);
+			});
 		}
 		
 		return valid;
@@ -64,7 +68,7 @@ $(document).ready(function(){
 	<div class="row">
 		<div id="UserName" class="large-6 columns">
 			<label>User Name</label>
-			<input name="UserName" type="text" value="{{row.UserName}}" onchange="ValidateUserName()">
+			<input name="UserName" type="text" value="{{row.Name}}" onchange="ValidateUserName()">
 		</div>
 		<div id="UserPassword" class="large-6 columns">
 			<label>Password</label>
@@ -76,36 +80,19 @@ $(document).ready(function(){
 		</div>
 	</div>
 	<div class="row">
-		<div id="IsAdmin" class="large-6 columns">
-			<label>Admin</label>
-			<select name="IsAdmin">
-				{{#if row}}
-					{{#if row.IsAdmin}}
-						<option selected="selected" value="1">Yes</option>
-						<option value="0">No</option>
-					{{else}}
-						<option value="1">Yes</option>
-						<option selected="selected" value="0">No</option>
-					{{/if}}
-				{{else}}
-					<option value="1">Yes</option>
-					<option selected="selected" value="0">No</option>
-				{{/if}}
-			</select>
-		</div>
-		<div id="IsAdmin" class="large-6 columns">
+		<div id="Valid" class="large-6 columns">
 			<label>Valid</label>
-			<select name="Valid" id="Valid">
+			<select name="Valid">
 			{{#if row}}
 				{{#if row.Valid}}
-					<option selected="selected" value="1">Yes</option>
-					<option value="0">No</option>
+				<option value="1" selected="selected">Yes</option>
+				<option value="0">No</option>
 				{{else}}
-					<option value="1">Yes</option>
-					<option selected="selected" value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="0" selected="selected">No</option>
 				{{/if}}
 			{{else}}
-				<option selected="selected" value="1">Yes</option>
+				<option value="1" selected="selected">Yes</option>
 				<option value="0">No</option>
 			{{/if}}
 			</select>

@@ -3,20 +3,20 @@ module.exports.ClientJobs = function( req, res )
 	if( req.session.IsLoggedIn )
 	{
 		var UsersJobsStmt = db.prepare( 
-			'SELECT JobsTable._id, JobsTable.JobName, JobsTable.JobDescription \
-			FROM JobsTable \
-			JOIN UserJobsTable \
-			ON UserJobsTable.JobId=JobsTable._id \
-			WHERE UserJobsTable.UserId=?;'
+			'SELECT Jobs._id, Jobs.JobName, Jobs.JobDescription \
+			FROM Jobs \
+			JOIN Assignments \
+			ON Assignments.JobId=Jobs._id \
+			WHERE Assignments.UserId=?;'
 		);
 
 		var ActiveJobStmt = db.prepare( 
-			'SELECT JobsTable.JobName, TimeTable.TimeIn \
-			FROM JobsTable \
-			JOIN TimeTable \
-			ON TimeTable.JobId=JobsTable._id \
-			WHERE TimeTable.TimeOut is NULL \
-			AND TimeTable.UserId=?;'
+			'SELECT Jobs.JobName, Times.TimeIn \
+			FROM Jobs \
+			JOIN Times \
+			ON Times.JobId=Jobs._id \
+			WHERE Times.TimeOut is NULL \
+			AND Times.UserId=?;'
 		);
 
 		UsersJobsStmt.all( req.session.UserId, function( err, Jobs ) {
@@ -54,14 +54,14 @@ module.exports.ClientHoursPayPeriod = function( req, res ) {
 	if( req.session.IsLoggedIn )
 	{
 		var HoursStmt = db.prepare(
-		  'SELECT JobsTable.JobName, TimeTable.TimeIn, TimeTable.TimeOut \
-		  FROM JobsTable \
-		  JOIN TimeTable \
-		  ON JobsTable._id=TimeTable.JobId \
-		  WHERE TimeTable.UserId=? \
-		  AND TimeTable.PayPeriod=? \
-		  AND TimeTable.TimeOut IS NOT NULL \
-		  ORDER BY TimeTable.TimeIn;'
+		  'SELECT Jobs.JobName, Times.TimeIn, Times.TimeOut \
+		  FROM Jobs \
+		  JOIN Times \
+		  ON Jobs._id=Times.JobId \
+		  WHERE Times.UserId=? \
+		  AND Times.PayPeriod=? \
+		  AND Times.TimeOut IS NOT NULL \
+		  ORDER BY Times.TimeIn;'
 		);
 	
 		HoursStmt.all( req.session.UserId, req.params.payPeriod, function( err, rows ) {

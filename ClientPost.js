@@ -9,50 +9,41 @@ module.exports.Login = function( req, res ) {
 		validator.isInt( req.body._id )
 	);
 	
-	if( isValidRequest )
-	{
+	if( isValidRequest ) {
 		var UserId = req.session.UserId;
 		var JobId = validator.toInt( req.body._id );
 		
-		db.get( 'SELECT _id FROM UserJobsTable WHERE UserId=? AND JobId=?;', UserId, JobId, function( err,row ) {
+		db.get( 'SELECT _id FROM Assignments  WHERE UserId=? AND JobId=?;', UserId, JobId, function( err,row ) {
 			if( err ) throw err;
 			
-			if( !_.isUndefined( row ) )
-			{
+			if( !_.isUndefined( row ) ) {
 				var TimeOut = getRoundedTime();
-				db.run( 'UPDATE TimeTable SET TimeOut=? WHERE UserId=? AND TimeOut IS NULL;', TimeOut, UserId, function( err,row ) {
+				db.run( 'UPDATE Times SET TimeOut=? WHERE UserId=? AND TimeOut IS NULL;', TimeOut, UserId, function( err,row ) {
 					if( err ) throw err;
 					var TimeIn = TimeOut;
 					var PayPeriod = getPayPeriod();
-					db.run( 'INSERT INTO TimeTable VALUES( NULL,?,?,?,NULL,NULL,?,1 );', UserId, JobId, TimeOut, PayPeriod );
+					db.run( 'INSERT INTO Times VALUES( NULL,?,?,?,NULL,NULL,?,1 );', UserId, JobId, TimeOut, PayPeriod );
 					res.redirect( '/Jobs' );
 				});
-			}
-			else
-			{
+			} else {
 				res.redirect( '/' );
 			}
 		});
-	}
-	else
-	{
+	} else {
 		res.redirect( '/' );
 	}
 }
 
 module.exports.Logout = function( req, res ) {
 	var redirect = '/';
-	if( req.session.IsLoggedIn )
-	{
+	if( req.session.IsLoggedIn ) {
 		var TimeOut = getRoundedTime();
 		var UserId = req.session.UserId;
 		
-		db.run( 'UPDATE TimeTable SET TimeOut=? WHERE UserId=? AND TimeOut IS NULL;', TimeOut, UserId, function( err, row ) {
+		db.run( 'UPDATE Times SET TimeOut=? WHERE UserId=? AND TimeOut IS NULL;', TimeOut, UserId, function( err, row ) {
 			res.redirect( '/Jobs' );
 		});
-	}
-	else
-	{
+	} else {
 		res.redirect( '/' );
 	}
 }

@@ -1,31 +1,30 @@
 <script>
 $(document).ready(
-  function() {
-    handleClick = function(id) {
-      window.location.href = '/Admin/Users/Edit/' + id;
-    }
-    $('nav>section>ul>li>a[href="/Admin/Users"]').parent().addClass('active')
-  }
+	function() {
+		handleClick = function(id) {
+			window.location.href = '/Admin/Users/Edit/' + id;
+		}
+		$('nav>section>ul>li>a[href="/Admin/Users"]').parent().addClass('active')
+	}
 );
 </script>
 
 <table>
-  <thead>
-    <tr>
-      <th width="50%">User</th>
-      <th width="1000">Admin</th>    
-    </tr>
-  </thead>
-  <tbody>
-      <tr class="pseudo-link" onclick="handleClick('')">
-        <td>Create</td>
-        <td></td>
-      </tr>
-    {{#each rows}}
-      <tr class="pseudo-link" onclick="handleClick({{this._id}})">
-        <td>{{this.UserName}}</td>
-        <td>{{Bool this.IsAdmin}}</td>
-      </tr>
-    {{/each}}
-  </tbody>
+	<thead>
+		<tr>
+			<th width="50%">User</th>
+			<th width="1000">Admin</th>		
+		</tr>
+	</thead>
+	<tbody>
+			<tr class="pseudo-link" onclick="handleClick('')">
+				<td>Create</td>
+				<td></td>
+			</tr>
+		{{#each rows}}
+			<tr class="pseudo-link" onclick="handleClick({{this._id}})">
+				<td>{{this.Name}}</td>
+			</tr>
+		{{/each}}
+	</tbody>
 </table>

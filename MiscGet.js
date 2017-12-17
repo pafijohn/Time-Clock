@@ -1,5 +1,4 @@
-module.exports.Styles = function( req, res )
-{
+module.exports.Styles = function( req, res ) {
 	fs.readFile( __dirname + '/styles/' + req.params[0], 'utf8', function ( err, data ) {
 		if( err ) throw err;
 		var type = '';

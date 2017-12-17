@@ -110,9 +110,9 @@ $(document).ready(function() {
       <select name="UserId" onchange="LoadXMLDoc()">
         {{#each users}}
         {{#if this.selected}}
-        <option value="{{this._id}}" selected>{{this.UserName}}</option>
+        <option value="{{this._id}}" selected>{{this.Name}}</option>
         {{else}}
-        <option value="{{this._id}}">{{this.UserName}}</option>
+        <option value="{{this._id}}">{{this.Name}}</option>
         {{/if}}
         {{/each}}
       </select>
