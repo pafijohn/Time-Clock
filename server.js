@@ -4,6 +4,7 @@ validator = require('validator');
 fs = require('fs');
 var express = require('express');
 var handlebars = require('handlebars');
+var pdf = require('html-pdf');
 
 crypto = require('crypto')
 var exphbs = require('express3-handlebars');
@@ -43,8 +44,7 @@ var server_options = {
 MAX_STRING_LENGTH = 255;
 
 _.mixin({
-	endsWith: function(string, suffix)
-	{
+	endsWith: function(string, suffix) {
 		return new RegExp(suffix + '$').test(string);
 	}
 });
@@ -55,8 +55,7 @@ _.mixin({
 		max = 126;
 		var str = '';
 		
-		for (var i = 0; i < 20; i++)
-		{
+		for (var i = 0; i < 20; i++) {
 			var j = _.random(min, max)
 			str += String.fromCharCode(j);
 		}
@@ -80,18 +79,17 @@ _.mixin({
 _.mixin({
 	isDate: function(str) {
 		var valid = _.toDate(str).isValid();
-		
-		console.log('Date compare: ' + str + ', ' + valid);
 		return valid;
 	}
 });
+
 
 var hbs = exphbs.create({
 	defaultLayout: 'main',
 	helpers: {
 		MsTime: function (context, options) {
 			if (context) {
-				return moment(context).format('MMM DD, YYYY HH:mm:ss');
+				return moment(context).format('MM/DD/YY HH:mm');
 			}
 			return '';
 		},
@@ -118,8 +116,7 @@ var hbs = exphbs.create({
 	}
 });
 
-getRoundedTime = function()
-{
+getRoundedTime = function() {
 	var now = moment();
 	var CurrentMinutes = 0;
 	var MinutesPast = 0;
@@ -141,8 +138,7 @@ getRoundedTime = function()
 	return EpochTime;
 };
 
-getPayPeriod = function()
-{
+getPayPeriod = function() {
 	var MAX_PAY_PERIOD = 24;
 	var now = moment();
 	var payPeriod = (now.month() + 1) * 2;
@@ -177,8 +173,7 @@ app.all('*', ensureSecure); // at top of routing calls
 http.createServer(app).listen(80)
 
 function ensureSecure(req, res, next) {
-	if(req.secure)
-	{
+	if(req.secure) {
 		// OK, continue
 		return next();
 	};
@@ -193,6 +188,43 @@ function ensureSecure(req, res, next) {
 app.get('/', MiscGet.Index);
 app.get('/styles/*', MiscGet.Styles);
 app.get('/scripts/*', MiscGet.Scripts);
+app.get('/error/:errorId', MiscGet.Error);
+
+app.post('/pdftest', function(req, res) {
+	var file = fs.readFileSync(__dirname + '/views/Admin/Hours/PdfExport.handlebars', 'UTF-8');
+	var template = handlebars.compile(file);
+	
+	var Stmt = '\
+		SELECT Users.Name, \
+		Jobs.JobName, \
+		Times._id, \
+		Times.TimeIn, \
+		Times.TimeOut, \
+		Times.RecordComment, \
+		Times.PayPeriod, \
+		Times.Valid \
+		FROM Users \
+		JOIN Times \
+		ON Times.UserId=Users._id \
+		JOIN Jobs \
+		ON Times.JobId=Jobs._id;';
+	
+	
+	db.all(Stmt, function(err, rows){
+		var html = template({rows: rows});
+		pdf.create(html).toBuffer(function(err, buffer) {
+			if (err) console.log(err);
+			
+			res.setHeader('Content-disposition', 'attachment; filename=pdf.pdf');
+			res.setHeader('Content-type', 'application/pdf');
+			
+			res.charset = 'UTF-8';
+			
+			res.write(buffer);
+			res.end();
+		});
+	});
+});
 
 // Miscellaneous Posts
 app.post('/LoginPost', MiscPost.Login);

@@ -35,8 +35,6 @@ module.exports.JobsEdit = function( req, res, next ) {
 }
 
 module.exports.HoursEdit = function( req, res, next ) {
-	console.log(req.body);
-	
 	var isValidRequest = (
 		_.has( req.body, '_id' ) &&
 		_.has( req.body, 'Valid' ) &&
@@ -72,8 +70,7 @@ module.exports.HoursEdit = function( req, res, next ) {
 		
 		isValidRequest = (i >= 1 && i <= 24);
 		
-		if (isValidRequest)
-		{
+		if (isValidRequest) {
 			next();
 		}
 	} else {

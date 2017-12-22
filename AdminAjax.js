@@ -1,5 +1,4 @@
-module.exports.UserJobs = function( req, res )
-{
+module.exports.UserJobs = function( req, res ) {
 	var isValidRequest = (
 		_.has( req.params, 'UserId' ) &&
 		validator.isLength( req.params.UserId, 1, MAX_STRING_LENGTH ) &&

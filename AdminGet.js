@@ -9,7 +9,7 @@ module.exports.Jobs = function( req, res ) {
 			});
 		});
 	} else {
-		res.redirect( '/' );
+		res.redirect( 'Misc/Get' );
 	}
 };
 

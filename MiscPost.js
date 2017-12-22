@@ -20,24 +20,27 @@ module.exports.Login = function( req, res ) {
 		
 		if( !_.isUndefined( row ) ) {
 			var UserPassword = crypto.createHash( 'sha256' ).update( req.body.UserPassword + row.Salt ).digest( 'base64' );
+			var loggedIn = UserPassword == row.Password;
 			
-			req.session.IsLoggedIn = UserPassword == row.Password;
-			if ( req.session.IsLoggedIn ) {
-				req.session.UserId = row._id;
-				req.session.Permissions = [];
-				
-				db.each('SELECT Permission FROM Permissions WHERE UserId=?;', row._id, function( err, row ) {
-					req.session.Permissions.push(row.Permission);
-				}, function( err, numRows ) {
-					// numRows should always be 1
-					req.session.IsAdmin = _.contains( req.session.Permissions, 'ASSIGN_PERMISSIONS' );
-					var redirect = '/Jobs';
+			if ( loggedIn ) {
+				req.session.regenerate(function(err) {
+					req.session.UserId = row._id;
+					req.session.IsLoggedIn = loggedIn;
+					req.session.Permissions = [];
 					
-					if( req.session.IsAdmin ) {
-						redirect = '/Admin/Jobs';
-					}
-					
-					res.redirect( redirect );
+					db.each('SELECT Permission FROM Permissions WHERE UserId=?;', row._id, function( err, row ) {
+						req.session.Permissions.push(row.Permission);
+					}, function( err, numRows ) {
+						// numRows should always be 1
+						req.session.IsAdmin = _.contains( req.session.Permissions, 'ASSIGN_PERMISSIONS' );
+						var redirect = '/Jobs';
+						
+						if( req.session.IsAdmin ) {
+							redirect = '/Admin/Jobs';
+						}
+						
+						res.redirect( redirect );
+					});
 				});
 			} else {
 				// Wrong password
